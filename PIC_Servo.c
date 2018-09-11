@@ -1,4 +1,4 @@
-﻿#include <18f26k22.h>
+#include <18f26k22.h>
 #fuses INTRC, PUT, NOBROWNOUT, NOWDT, NOPROTECT, NOLVP, NOMCLR
 #use delay(CLOCK = 64M)
 #use RS232(BAUD=19200,XMIT=PIN_C6,RCV=PIN_C7)

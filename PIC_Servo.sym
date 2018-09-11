@@ -104,16 +104,16 @@ User Memory space:
 User Memory space: 
 
 Project Directory:
-    C:\Users\Keisuke\Documents\Private\Program\PICスイッチ&サーボ\
+    C:\Users\Keisuke\Documents\Private\Program\PIC_Servo\
 
 Project Files:
-    スイッチ&サーボ.c                                       [11-9-18 17:35  CRC=BC72A5AC]
+    PIC_Servo.c                                             [11-9-18 23:33  CRC=A75EECF8]
     ..\..\..\..\..\..\Program Files (x86)\PICC\devices\18f26k22.h [04-4-12 14:18  CRC=BC39CD71]
 
-Source signature=34E6408E
+Source signature=1FD287DA
 
 Units:
-    スイッチ&サーボ (main)
+    PIC_Servo (main)
 
 Compiler Settings:
     Processor:      PIC18F26K22
@@ -124,9 +124,9 @@ Compiler Settings:
     Float,Double:   32,32
 
 Output Files:
-    Errors:      スイッチ&サーボ.err
-    INHX32:      スイッチ&サーボ.hex
-    Symbols:     スイッチ&サーボ.sym
-    List:        スイッチ&サーボ.lst
-    Debug/eCOD:  スイッチ&サーボ.cod
-    Project:     スイッチ&サーボ.PJT
+    Errors:      PIC_Servo.err
+    INHX32:      PIC_Servo.hex
+    Symbols:     PIC_Servo.sym
+    List:        PIC_Servo.lst
+    Debug/eCOD:  PIC_Servo.cod
+    Project:     PIC_Servo.PJT
