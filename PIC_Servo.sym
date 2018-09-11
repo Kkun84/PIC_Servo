@@ -1,0 +1,132 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004     @INTERRUPT_AREA
+005     @INTERRUPT_AREA
+006     @INTERRUPT_AREA
+007     @INTERRUPT_AREA
+008     @INTERRUPT_AREA
+009     @INTERRUPT_AREA
+00A     @INTERRUPT_AREA
+00B     @INTERRUPT_AREA
+00C     @INTERRUPT_AREA
+00D     @INTERRUPT_AREA
+00E     @INTERRUPT_AREA
+00F     @INTERRUPT_AREA
+010     @INTERRUPT_AREA
+011     @INTERRUPT_AREA
+012     @INTERRUPT_AREA
+013     @INTERRUPT_AREA
+014     @INTERRUPT_AREA
+015     @INTERRUPT_AREA
+016     @INTERRUPT_AREA
+017     @INTERRUPT_AREA
+018     @INTERRUPT_AREA
+019     @INTERRUPT_AREA
+01A-01B servoOut
+01C-01D servoPulse
+01E-01F iPin
+020-023 inCount
+024     intTimer0.count
+025-026 intTimer0.myServoPulse
+027-028 intTimer1.count
+029-02A intTimer1.inOld
+02B     @PRINTF_D_19200_31766_31767.P1
+02B     @delay_ms1.P2
+02B     MAIN.@SCRATCH1
+02C     @PRINTF_D_19200_31766_31767.P1
+02D     @PRINTF_D_19200_31766_31767.@SCRATCH1
+02E     @PRINTF_D_19200_31766_31767.@SCRATCH2
+02F     @PRINTF_D_19200_31766_31767.@SCRATCH3
+030     @PRINTF_D_19200_31766_31767.@SCRATCH4
+031     @DIV88.P1
+032     @DIV88.P1
+033     @DIV88.@SCRATCH1
+034     intTimer0.i
+034     intTimer1.i
+035     in.pin_num
+035     intTimer0.@SCRATCH1
+035     intTimer1.@SCRATCH1
+036     @WRITEBITA.P1
+036     in.@SCRATCH1
+036     intTimer0.@SCRATCH2
+036     intTimer1.@SCRATCH2
+037     @READBITA.P1
+037     @WRITEBITA.P2
+037     intTimer0.@SCRATCH3
+037     intTimer1.@SCRATCH3
+038-039 @READBITA.P1
+038-039 @WRITEBITA.P2
+F55     CCP_5_LOW
+F55     CCP_5
+F56     CCP_5_HIGH
+F58     CCP_4_LOW
+F58     CCP_4
+F59     CCP_4_HIGH
+F5E     CCP_3_LOW
+F5E     CCP_3
+F5F     CCP_3_HIGH
+F67     CCP_2
+F67     CCP_2_LOW
+F68     CCP_2_HIGH
+F78.6   C2OUT
+F79.6   C1OUT
+FBE     CCP_1_LOW
+FBE     CCP_1
+FBF     CCP_1_HIGH
+FE1-FE2 @READ_PACKED_MEMORY.P1
+FE1-FE2 @WRITE_PACKED_MEMORY.P2
+FE9-FEA @READ_PACKED_MEMORY.P1
+FE9-FEA @WRITE_PACKED_MEMORY.P2
+FE9-FEA @READ_PROGRAM_MEMORY.P3
+FE9-FEA @WRITE_PROGRAM_MEMORY.P4
+FF6-FF8 @READ_PROGRAM_MEMORY.P1
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+03B8  @delay_ms1
+01DE  in
+01B0  @READBITA
+03E2  MAIN
+02DE  @DIV88
+0306  @PRINTF_D_19200_31766_31767
+00F8  intTimer0
+00BA  @WRITEBITA
+0208  intTimer1
+03E2  @cinit1
+0426  @cinit2
+
+
+User Memory space: 
+
+User Memory space: 
+
+Project Directory:
+    C:\Users\Keisuke\Documents\Private\Program\PICスイッチ&サーボ\
+
+Project Files:
+    スイッチ&サーボ.c                                       [11-9-18 17:35  CRC=BC72A5AC]
+    ..\..\..\..\..\..\Program Files (x86)\PICC\devices\18f26k22.h [04-4-12 14:18  CRC=BC39CD71]
+
+Source signature=34E6408E
+
+Units:
+    スイッチ&サーボ (main)
+
+Compiler Settings:
+    Processor:      PIC18F26K22
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      スイッチ&サーボ.err
+    INHX32:      スイッチ&サーボ.hex
+    Symbols:     スイッチ&サーボ.sym
+    List:        スイッチ&サーボ.lst
+    Debug/eCOD:  スイッチ&サーボ.cod
+    Project:     スイッチ&サーボ.PJT
