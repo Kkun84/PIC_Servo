@@ -1,4 +1,4 @@
-#include <18f26k22.h>
+ï»¿#include <18f26k22.h>
 #fuses INTRC, PUT, NOBROWNOUT, NOWDT, NOPROTECT, NOLVP, NOMCLR
 #use delay(CLOCK = 64M)
 #use RS232(BAUD=19200,XMIT=PIN_C6,RCV=PIN_C7)
@@ -6,32 +6,32 @@
 #use fast_io(b)
 #use fast_io(c)
 
-// ƒT[ƒ{M†Š„‚è‚İƒJƒEƒ“ƒg”
-// ƒvƒŠƒXƒP[ƒ‰16/(64MHz/4)=1us/ƒJƒEƒ“ƒg
-// 1us/ƒJƒEƒ“ƒg*100ƒJƒEƒ“ƒg=0.1ms
+// ã‚µãƒ¼ãƒœä¿¡å·å‰²ã‚Šè¾¼ã¿ã‚«ã‚¦ãƒ³ãƒˆæ•°
+// ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ©16/(64MHz/4)=1us/ã‚«ã‚¦ãƒ³ãƒˆ
+// 1us/ã‚«ã‚¦ãƒ³ãƒˆ*100ã‚«ã‚¦ãƒ³ãƒˆ=0.1ms
 #define INTERVAL_T0 100
-// ƒT[ƒ{M†Š„‚è‚İƒJƒEƒ“ƒg”
-// ƒvƒŠƒXƒP[ƒ‰8/(64MHz/4)=0.5us/ƒJƒEƒ“ƒg
-// 0.5us/ƒJƒEƒ“ƒg*20000ƒJƒEƒ“ƒg=10ms
+// ã‚µãƒ¼ãƒœä¿¡å·å‰²ã‚Šè¾¼ã¿ã‚«ã‚¦ãƒ³ãƒˆæ•°
+// ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ©8/(64MHz/4)=0.5us/ã‚«ã‚¦ãƒ³ãƒˆ
+// 0.5us/ã‚«ã‚¦ãƒ³ãƒˆ*20000ã‚«ã‚¦ãƒ³ãƒˆ=10ms
 #define INTERVAL_T1 20000
-// ƒT[ƒ{‚ÌŒÂ”
+// ã‚µãƒ¼ãƒœã®å€‹æ•°
 #define SERVO_NUM 2
-// “ü—Íƒsƒ“‚Ì”
+// å…¥åŠ›ãƒ”ãƒ³ã®æ•°
 #define IN_NUM 2
 
-// ƒT[ƒ{M†o—Íƒsƒ“
-// {0,1}:ô–ÊŠ
+// ã‚µãƒ¼ãƒœä¿¡å·å‡ºåŠ›ãƒ”ãƒ³
+// {0,1}:æ´—é¢æ‰€
 int servoOut[SERVO_NUM] = {PIN_B0, PIN_B1};
-// o—Í‚·‚éƒT[ƒ{‚Ì’l
+// å‡ºåŠ›ã™ã‚‹ã‚µãƒ¼ãƒœã®å€¤
 int servoPulse[SERVO_NUM] = {0, 0};
-// “ü—Íƒsƒ“
-// 0:ô–ÊŠ
+// å…¥åŠ›ãƒ”ãƒ³
+// 0:æ´—é¢æ‰€
 int iPin[IN_NUM] = {PIN_C4, PIN_C5};
-// “ü—Íƒsƒ“•Ï‰»Œã‚Ì•b”[ds]
-// Å‘å6553.5s=109.225min
+// å…¥åŠ›ãƒ”ãƒ³å¤‰åŒ–å¾Œã®ç§’æ•°[ds]
+// æœ€å¤§6553.5s=109.225min
 long inCount[IN_NUM] = {0xffff, 0xffff};
 
-// pin_num‚É‘Î‰‚µ‚½“ü—Í‚ğ•Ô‚·
+// pin_numã«å¯¾å¿œã—ãŸå…¥åŠ›ã‚’è¿”ã™
 int in(int pin_num)
 {
 	return input(iPin[pin_num]);
@@ -40,17 +40,17 @@ int in(int pin_num)
 void main(void)
 {
 	// int i;
-	// ƒZƒbƒgƒgƒŠƒX
+	// ã‚»ãƒƒãƒˆãƒˆãƒªã‚¹
 	set_tris_a(0b10000000);
 	set_tris_b(0b10000000);
 	set_tris_c(0b00110000);
-	// ƒT[ƒ{M†‘—M—p
-	// ƒvƒŠƒXƒP[ƒ‰16/(64MHz/4)=1us/ƒJƒEƒ“ƒg
+	// ã‚µãƒ¼ãƒœä¿¡å·é€ä¿¡ç”¨
+	// ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ©16/(64MHz/4)=1us/ã‚«ã‚¦ãƒ³ãƒˆ
 	setup_timer_0(T0_INTERNAL | T0_DIV_16);
-	// “ü—Íƒsƒ“‚Ì•Ï‰»‚µ‚Ä‚¢‚È‚¢ŠÔ‚ğŒv‚é
-	// ƒvƒŠƒXƒP[ƒ‰8/(64MHz/4)=0.5us/ƒJƒEƒ“ƒg
+	// å…¥åŠ›ãƒ”ãƒ³ã®å¤‰åŒ–ã—ã¦ã„ãªã„æ™‚é–“ã‚’è¨ˆã‚‹
+	// ãƒ—ãƒªã‚¹ã‚±ãƒ¼ãƒ©8/(64MHz/4)=0.5us/ã‚«ã‚¦ãƒ³ãƒˆ
 	setup_timer_1(T1_INTERNAL | T1_DIV_BY_8);
-	// Š„‚è‚İ‹–‰Â
+	// å‰²ã‚Šè¾¼ã¿è¨±å¯
 	enable_interrupts(INT_TIMER0);
 	enable_interrupts(INT_TIMER1);
 	enable_interrupts(GLOBAL);
@@ -63,7 +63,7 @@ void main(void)
 	
 	while(1)
 	{
-		// ô–ÊŠ
+		// æ´—é¢æ‰€
 		if(inCount[0] < 5)
 		{
 			servoPulse[0] = in(0)? 12: 15;
@@ -80,7 +80,7 @@ void main(void)
 		
 		printf("%5d,%5d\r\n", servoPulse[0], servoPulse[1]);
 		
-		// ‘Ò‹@
+		// å¾…æ©Ÿ
 		delay_ms(10);
 	}
 }
@@ -89,29 +89,29 @@ void main(void)
 void intTimer0(void)
 {
 	int i;
-	// Š„‚è‚İ‰ñ”ƒJƒEƒ“ƒg
+	// å‰²ã‚Šè¾¼ã¿å›æ•°ã‚«ã‚¦ãƒ³ãƒˆ
 	static int count = 0;
-	// servoPulse‚Ì’l‚ğ•Û‚·‚é
+	// servoPulseã®å€¤ã‚’ä¿æŒã™ã‚‹
 	static int myServoPulse[SERVO_NUM] = {0};
-	// ƒ^ƒCƒ}[Äİ’è
+	// ã‚¿ã‚¤ãƒãƒ¼å†è¨­å®š
 	set_timer0(0xffff - INTERVAL_T0);
-	// ƒT[ƒ{M†o—Í
+	// ã‚µãƒ¼ãƒœä¿¡å·å‡ºåŠ›
 	for(i = 0; i < SERVO_NUM; i++)
 	{
-		// ƒJƒEƒ“ƒg”äŠr‚µ‚Äƒpƒ‹ƒXo—Í
+		// ã‚«ã‚¦ãƒ³ãƒˆæ¯”è¼ƒã—ã¦ãƒ‘ãƒ«ã‚¹å‡ºåŠ›
 		if(count < myServoPulse[i])
 			output_high(servoOut[i]);
 		else
 			output_low(servoOut[i]);
 	}
-	// ƒCƒ“ƒNƒŠƒƒ“ƒg
+	// ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆ
 	count++;
-	// 1us/ƒJƒEƒ“ƒg * 200 = 20ms‚ğ’´‚¦‚½‚çƒŠƒZƒbƒg
+	// 1us/ã‚«ã‚¦ãƒ³ãƒˆ * 200 = 20msã‚’è¶…ãˆãŸã‚‰ãƒªã‚»ãƒƒãƒˆ
 	if(count > 200)
 	{
-		// count‰Šú‰»
+		// countåˆæœŸåŒ–
 		count = 0;
-		// ’lXV
+		// å€¤æ›´æ–°
 		for(i = 0; i < SERVO_NUM; i++)
 			myServoPulse[i] = servoPulse[i];
 	}
@@ -121,25 +121,25 @@ void intTimer0(void)
 void intTimer1(void)
 {
 	int i;
-	// Š„‚è‚İ‰ñ”ƒJƒEƒ“ƒg
+	// å‰²ã‚Šè¾¼ã¿å›æ•°ã‚«ã‚¦ãƒ³ãƒˆ
 	static long count = 0;
-	// ‘O‚ÌŠ„‚è‚İ‚Å‚Ì“ü—Í‚Ì’l
+	// å‰ã®å‰²ã‚Šè¾¼ã¿ã§ã®å…¥åŠ›ã®å€¤
 	static int inOld[IN_NUM] = {0};
-	// ƒ^ƒCƒ}[Äİ’è
+	// ã‚¿ã‚¤ãƒãƒ¼å†è¨­å®š
 	set_timer1(0xffff - INTERVAL_T1);
-	// 10ms * 10 = 0.1s‚²‚Æ‚ÉÀs‚·‚é
+	// 10ms * 10 = 0.1sã”ã¨ã«å®Ÿè¡Œã™ã‚‹
 	if(count >= 10)
 	{
-		// count‰Šú‰»
+		// countåˆæœŸåŒ–
 		count = 0;
-		// ’lXV
+		// å€¤æ›´æ–°
 		for(i = 0; i < IN_NUM; i++)
 		{
-			// ˆÈ‘O‚Æ“¯‚¶’l‚¾‚Á‚½‚çƒCƒ“ƒNƒŠƒƒ“ƒg
-			// ˆá‚Á‚½‚ç0‚É‚·‚é
+			// ä»¥å‰ã¨åŒã˜å€¤ã ã£ãŸã‚‰ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆ
+			// é•ã£ãŸã‚‰0ã«ã™ã‚‹
 			if(in(i) == inOld[i])
 			{
-				// ƒI[ƒo[ƒtƒ[‚µ‚»‚¤‚¾‚Á‚½‚ç‰ñ”ğ‚·‚é
+				// ã‚ªãƒ¼ãƒãƒ¼ãƒ•ãƒ­ãƒ¼ã—ãã†ã ã£ãŸã‚‰å›é¿ã™ã‚‹
 				if(inCount[i] != 0xffff)
 					inCount[i]++;
 			}
@@ -150,6 +150,6 @@ void intTimer1(void)
 			}
 		}
 	}
-	// ƒCƒ“ƒNƒŠƒƒ“ƒg
+	// ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆ
 	count++;
 }
