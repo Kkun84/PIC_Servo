@@ -1,15 +1,15 @@
-CCS PCH C Compiler, Version 4.132, 55358               11-9-18 23:33
+CCS PCH C Compiler, Version 4.132, 55358               12-9-18 16:39
 
                Filename: C:\Users\Keisuke\Documents\Private\Program\PIC_Servo\PIC_Servo.lst
 
-               ROM used: 1328 bytes (2%)
-                         Largest free fragment is 64204
-               RAM used: 44 (1%) at main() level
-                         58 (1%) worst case
+               ROM used: 1902 bytes (3%)
+                         Largest free fragment is 63630
+               RAM used: 46 (1%) at main() level
+                         74 (2%) worst case
                Stack:    5 worst case (2 in main + 3 for interrupts)
 
 *
-00000:  GOTO   03E2
+00000:  GOTO   0628
 *
 00008:  MOVWF  04
 0000A:  MOVFF  FD8,05
@@ -34,11 +34,11 @@ CCS PCH C Compiler, Version 4.132, 55358               11-9-18 23:33
 00054:  BTFSS  FF2.5
 00056:  GOTO   0060
 0005A:  BTFSC  FF2.2
-0005C:  GOTO   00F8
+0005C:  GOTO   0382
 00060:  BTFSS  F9D.0
 00062:  GOTO   006C
 00066:  BTFSC  F9E.0
-00068:  GOTO   0208
+00068:  GOTO   0504
 0006C:  MOVFF  0E,00
 00070:  MOVFF  0F,01
 00074:  MOVFF  10,02
@@ -67,298 +67,296 @@ CCS PCH C Compiler, Version 4.132, 55358               11-9-18 23:33
 ....................  
 .................... #fuses INTRC, PUT, NOBROWNOUT, NOWDT, NOPROTECT, NOLVP, NOMCLR 
 .................... #use delay(CLOCK = 64M) 
-003B8:  CLRF   FEA
-003BA:  MOVLW  2B
-003BC:  MOVWF  FE9
-003BE:  MOVF   FEF,W
-003C0:  BZ    03DE
-003C2:  MOVLW  14
-003C4:  MOVWF  01
-003C6:  CLRF   00
-003C8:  DECFSZ 00,F
-003CA:  BRA    03C8
-003CC:  DECFSZ 01,F
-003CE:  BRA    03C6
-003D0:  MOVLW  BF
-003D2:  MOVWF  00
-003D4:  DECFSZ 00,F
-003D6:  BRA    03D4
-003D8:  BRA    03DA
-003DA:  DECFSZ FEF,F
-003DC:  BRA    03C2
-003DE:  GOTO   052E (RETURN)
+005FE:  CLRF   FEA
+00600:  MOVLW  2E
+00602:  MOVWF  FE9
+00604:  MOVF   FEF,W
+00606:  BZ    0624
+00608:  MOVLW  14
+0060A:  MOVWF  01
+0060C:  CLRF   00
+0060E:  DECFSZ 00,F
+00610:  BRA    060E
+00612:  DECFSZ 01,F
+00614:  BRA    060C
+00616:  MOVLW  BF
+00618:  MOVWF  00
+0061A:  DECFSZ 00,F
+0061C:  BRA    061A
+0061E:  BRA    0620
+00620:  DECFSZ FEF,F
+00622:  BRA    0608
+00624:  GOTO   076C (RETURN)
 .................... #use RS232(BAUD=19200,XMIT=PIN_C6,RCV=PIN_C7) 
 .................... #use fast_io(a) 
 .................... #use fast_io(b) 
 .................... #use fast_io(c) 
 ....................  
-.................... // サーボ信号割り込みカウント数 
-.................... // プリスケーラ16/(64MHz/4)=1us/カウント 
-.................... // 1us/カウント*100カウント=0.1ms 
-.................... #define INTERVAL_T0 100 
-.................... // サーボ信号割り込みカウント数 
+.................... // サーボ信号出力用割り込み 
+.................... // T0の周期[us] 
+.................... #define T0_PERIOD 100 
+.................... // プリスケーラ16/(64[MHz]/4)=1[us/カウント] 
+.................... // T0_INTERVAL[カウント] = T0_PERIOD[us] / 1[us/カウント] 
+.................... #define T0_INTERVAL T0_PERIOD 
+.................... // T0_20ms[ms] = (20[ms] / 1[us/カウント]) / T0_INTERVAL[カウント] 
+.................... #define T0_20ms (20000 / T0_INTERVAL) 
+....................  
+.................... // 入力状態時間計測用割り込み 
+.................... // T1の周期[us] 
+.................... #define T1_PERIOD 10000 
 .................... // プリスケーラ8/(64MHz/4)=0.5us/カウント 
-.................... // 0.5us/カウント*20000カウント=10ms 
-.................... #define INTERVAL_T1 20000 
+.................... // T1_INTERVAL[カウント] = T1_PERIOD[us] / 0.5[us/カウント] = T1_PERIOD * 2 
+.................... #define T1_INTERVAL (T1_PERIOD * 2) 
+....................  
+.................... /*****************************変更ポイント*****************************/ 
 .................... // サーボの個数 
 .................... #define SERVO_NUM 2 
 .................... // 入力ピンの数 
-.................... #define IN_NUM 2 
+.................... #define IN_NUM 1 
 ....................  
+.................... /*****************************変更ポイント*****************************/ 
 .................... // サーボ信号出力ピン 
-.................... // {0,1}:洗面所 
-.................... int servoOut[SERVO_NUM] = {PIN_B0, PIN_B1}; 
-.................... // 出力するサーボの値 
-.................... int servoPulse[SERVO_NUM] = {0, 0}; 
+.................... int servoOut[SERVO_NUM] = {PIN_C2, PIN_C3}; 
 .................... // 入力ピン 
-.................... // 0:洗面所 
-.................... int iPin[IN_NUM] = {PIN_C4, PIN_C5}; 
+.................... int inPin[IN_NUM] = {PIN_C4}; 
+....................  
+.................... // 出力するサーボの値[ms] 
+.................... // (1000/T0_PERIOD)が掛けられるため小数点以下に注意 
+.................... float servoPulse[SERVO_NUM] = {0}; 
 .................... // 入力ピン変化後の秒数[ds] 
 .................... // 最大6553.5s=109.225min 
-.................... long inCount[IN_NUM] = {0xffff, 0xffff}; 
+.................... long inCount[IN_NUM] = {0}; 
+....................  
 ....................  
 .................... // pin_numに対応した入力を返す 
 .................... int in(int pin_num) 
 .................... { 
-.................... 	return input(iPin[pin_num]); 
+.................... 	return input(inPin[pin_num]); 
 *
-001DE:  CLRF   03
-001E0:  MOVF   35,W
-001E2:  ADDLW  1E
-001E4:  MOVWF  FE9
-001E6:  MOVLW  00
-001E8:  ADDWFC 03,W
-001EA:  MOVWF  FEA
-001EC:  MOVFF  FEF,36
-001F0:  MOVFF  36,37
-001F4:  MOVLW  0F
-001F6:  MOVWF  39
-001F8:  MOVLW  80
-001FA:  MOVWF  38
-001FC:  RCALL  01B0
-001FE:  MOVLW  00
-00200:  BTFSC  01.0
-00202:  MOVLW  01
-00204:  MOVWF  01
+004DA:  CLRF   03
+004DC:  MOVF   38,W
+004DE:  ADDLW  1C
+004E0:  MOVWF  FE9
+004E2:  MOVLW  00
+004E4:  ADDWFC 03,W
+004E6:  MOVWF  FEA
+004E8:  MOVFF  FEF,39
+004EC:  MOVFF  39,3A
+004F0:  MOVLW  0F
+004F2:  MOVWF  3C
+004F4:  MOVLW  80
+004F6:  MOVWF  3B
+004F8:  RCALL  04AC
+004FA:  MOVLW  00
+004FC:  BTFSC  01.0
+004FE:  MOVLW  01
+00500:  MOVWF  01
 .................... } 
-00206:  RETURN 0
+00502:  RETURN 0
 ....................  
 .................... void main(void) 
 .................... { 
 *
-003E2:  CLRF   FF8
-003E4:  BCF    FD0.7
-003E6:  BSF    07.7
-003E8:  CLRF   FEA
-003EA:  CLRF   FE9
-003EC:  MOVLW  70
-003EE:  MOVWF  FD3
-003F0:  BSF    F9B.6
-003F2:  BCF    F9B.7
-003F4:  BSF    FB8.3
-003F6:  MOVLW  40
-003F8:  MOVWF  FAF
-003FA:  MOVLW  03
-003FC:  MOVWF  FB0
-003FE:  MOVLW  A6
-00400:  MOVWF  FAC
-00402:  MOVLW  90
-00404:  MOVWF  FAB
-00406:  CLRF   24
-00408:  CLRF   28
-0040A:  CLRF   27
-0040C:  MOVF   FC1,W
-0040E:  ANDLW  F0
-00410:  MOVWF  FC1
-00412:  MOVLW  00
-00414:  MOVLB  F
-00416:  MOVWF  x38
-00418:  MOVWF  x3C
-0041A:  MOVWF  x39
-0041C:  MOVWF  x3A
-0041E:  MOVWF  x3B
-00420:  CLRF   F77
-00422:  CLRF   F78
-00424:  CLRF   F79
-00426:  MOVLW  08
-00428:  MOVWF  1A
-0042A:  MOVLW  09
-0042C:  MOVWF  1B
-0042E:  CLRF   1C
-00430:  CLRF   1D
-00432:  MOVLW  14
-00434:  MOVWF  1E
-00436:  MOVLW  15
-00438:  MOVWF  1F
-0043A:  SETF   20
-0043C:  SETF   21
-0043E:  SETF   22
-00440:  SETF   23
-00442:  CLRF   25
-00444:  CLRF   26
-00446:  CLRF   29
-00448:  CLRF   2A
-.................... 	// int i; 
+00628:  CLRF   FF8
+0062A:  BCF    FD0.7
+0062C:  BSF    07.7
+0062E:  CLRF   FEA
+00630:  CLRF   FE9
+00632:  MOVLW  70
+00634:  MOVWF  FD3
+00636:  BSF    F9B.6
+00638:  BCF    F9B.7
+0063A:  BSF    FB8.3
+0063C:  MOVLW  40
+0063E:  MOVWF  FAF
+00640:  MOVLW  03
+00642:  MOVWF  FB0
+00644:  MOVLW  A6
+00646:  MOVWF  FAC
+00648:  MOVLW  90
+0064A:  MOVWF  FAB
+0064C:  CLRF   27
+0064E:  CLRF   2B
+00650:  CLRF   2A
+00652:  MOVF   FC1,W
+00654:  ANDLW  F0
+00656:  MOVWF  FC1
+00658:  MOVLW  00
+0065A:  MOVLB  F
+0065C:  MOVWF  x38
+0065E:  MOVWF  x3C
+00660:  MOVWF  x39
+00662:  MOVWF  x3A
+00664:  MOVWF  x3B
+00666:  CLRF   F77
+00668:  CLRF   F78
+0066A:  CLRF   F79
+0066C:  MOVLW  12
+0066E:  MOVWF  1A
+00670:  MOVLW  13
+00672:  MOVWF  1B
+00674:  MOVLW  14
+00676:  MOVWF  1C
+00678:  CLRF   1D
+0067A:  CLRF   1E
+0067C:  CLRF   1F
+0067E:  CLRF   20
+00680:  CLRF   21
+00682:  CLRF   22
+00684:  CLRF   23
+00686:  CLRF   24
+00688:  CLRF   25
+0068A:  CLRF   26
+0068C:  CLRF   28
+0068E:  CLRF   29
+00690:  CLRF   2C
+.................... 	// 変数宣言 
+.................... 	int i; 
 .................... 	// セットトリス 
 .................... 	set_tris_a(0b10000000); 
-0044A:  MOVLW  80
-0044C:  MOVWF  F92
+00692:  MOVLW  80
+00694:  MOVWF  F92
 .................... 	set_tris_b(0b10000000); 
-0044E:  MOVWF  F93
+00696:  MOVWF  F93
 .................... 	set_tris_c(0b00110000); 
-00450:  MOVLW  30
-00452:  MOVWF  F94
-.................... 	// サーボ信号送信用 
+00698:  MOVLW  30
+0069A:  MOVWF  F94
+.................... 	// サーボ信号送信用タイマ 
 .................... 	// プリスケーラ16/(64MHz/4)=1us/カウント 
 .................... 	setup_timer_0(T0_INTERNAL | T0_DIV_16); 
-00454:  MOVLW  83
-00456:  MOVWF  FD5
-.................... 	// 入力ピンの変化していない時間を計る 
+0069C:  MOVLW  83
+0069E:  MOVWF  FD5
+.................... 	// 入力ピンの変化していない時間を計るタイマ 
 .................... 	// プリスケーラ8/(64MHz/4)=0.5us/カウント 
 .................... 	setup_timer_1(T1_INTERNAL | T1_DIV_BY_8); 
-00458:  MOVLW  37
-0045A:  MOVWF  FCD
-0045C:  CLRF   FCC
+006A0:  MOVLW  37
+006A2:  MOVWF  FCD
+006A4:  CLRF   FCC
 .................... 	// 割り込み許可 
 .................... 	enable_interrupts(INT_TIMER0); 
-0045E:  BSF    FF2.5
+006A6:  BSF    FF2.5
 .................... 	enable_interrupts(INT_TIMER1); 
-00460:  BSF    F9D.0
+006A8:  BSF    F9D.0
+.................... 	 
 .................... 	enable_interrupts(GLOBAL); 
-00462:  MOVLW  C0
-00464:  IORWF  FF2,F
-.................... 	 
-.................... 	output_high(PIN_A0); 
-00466:  BSF    F89.0
-.................... 	output_high(PIN_A1); 
-00468:  BSF    F89.1
-.................... 	output_low(PIN_A0); 
-0046A:  BCF    F89.0
-.................... 	output_low(PIN_A1); 
-0046C:  BCF    F89.1
-.................... 	// printf("%5lu,%5lu\r\n", inCount[0], inCount[1]); 
-.................... 	 
+006AA:  MOVLW  C0
+006AC:  IORWF  FF2,F
 .................... 	while(1) 
 .................... 	{ 
-.................... 		// 洗面所 
+.................... 		/*****************************変更ポイント*****************************/ 
+.................... 		/* 
+.................... 			in(0)が0→1 : servoOut[0]が動作 
+.................... 			in(0)が1→0 : servoOut[1]が動作 
+.................... 		*/ 
 .................... 		if(inCount[0] < 5) 
-0046E:  MOVF   21,F
-00470:  BNZ   04B6
-00472:  MOVF   20,W
-00474:  SUBLW  04
-00476:  BNC   04B6
-00478:  CLRF   19
-0047A:  BTFSC  FF2.7
-0047C:  BSF    19.7
-0047E:  BCF    FF2.7
+006AE:  MOVF   26,F
+006B0:  BNZ   071E
+006B2:  MOVF   25,W
+006B4:  SUBLW  04
+006B6:  BNC   071E
+006B8:  CLRF   19
+006BA:  BTFSC  FF2.7
+006BC:  BSF    19.7
+006BE:  BCF    FF2.7
 .................... 		{ 
-.................... 			servoPulse[0] = in(0)? 12: 15; 
-00480:  CLRF   35
-00482:  MOVLB  0
-00484:  RCALL  01DE
-00486:  BTFSC  19.7
-00488:  BSF    FF2.7
-0048A:  MOVF   01,F
-0048C:  BZ    0492
-0048E:  MOVLW  0C
-00490:  BRA    0494
-00492:  MOVLW  0F
-00494:  MOVWF  1C
-00496:  CLRF   19
-00498:  BTFSC  FF2.7
-0049A:  BSF    19.7
-0049C:  BCF    FF2.7
-.................... 			servoPulse[1] = in(0)? 15: 18; 
-0049E:  CLRF   35
-004A0:  RCALL  01DE
-004A2:  BTFSC  19.7
-004A4:  BSF    FF2.7
-004A6:  MOVF   01,F
-004A8:  BZ    04AE
-004AA:  MOVLW  0F
-004AC:  BRA    04B0
-004AE:  MOVLW  12
-004B0:  MOVWF  1D
+.................... 			servoPulse[0] = in(0)? 1.8: 1.5; 
+006C0:  CLRF   38
+006C2:  MOVLB  0
+006C4:  RCALL  04DA
+006C6:  BTFSC  19.7
+006C8:  BSF    FF2.7
+006CA:  MOVF   01,F
+006CC:  BZ    06D2
+006CE:  MOVLW  01
+006D0:  BRA    06D4
+006D2:  MOVLW  01
+006D4:  CLRF   2F
+006D6:  MOVWF  2E
+006D8:  RCALL  05C8
+006DA:  MOVFF  03,20
+006DE:  MOVFF  02,1F
+006E2:  MOVFF  01,1E
+006E6:  MOVFF  00,1D
+006EA:  CLRF   19
+006EC:  BTFSC  FF2.7
+006EE:  BSF    19.7
+006F0:  BCF    FF2.7
+.................... 			 
+.................... 			servoPulse[1] = in(0)? 1.4: 1.7; 
+006F2:  CLRF   38
+006F4:  RCALL  04DA
+006F6:  BTFSC  19.7
+006F8:  BSF    FF2.7
+006FA:  MOVF   01,F
+006FC:  BZ    0702
+006FE:  MOVLW  01
+00700:  BRA    0704
+00702:  MOVLW  01
+00704:  CLRF   2F
+00706:  MOVWF  2E
+00708:  RCALL  05C8
+0070A:  MOVFF  03,24
+0070E:  MOVFF  02,23
+00712:  MOVFF  01,22
+00716:  MOVFF  00,21
 .................... 		} 
-.................... 		else if(10 <= inCount[0] && inCount[0] < 15) 
-004B2:  BRA    04DC
-004B4:  MOVLB  F
-004B6:  MOVF   21,F
-004B8:  BNZ   04C0
-004BA:  MOVF   20,W
-004BC:  SUBLW  09
-004BE:  BC    04D4
-004C0:  MOVF   21,F
-004C2:  BNZ   04D4
-004C4:  MOVF   20,W
-004C6:  SUBLW  0E
-004C8:  BNC   04D4
+.................... 		else if(5 <= inCount[0] && inCount[0] < 10) 
+0071A:  BRA    0766
+0071C:  MOVLB  F
+0071E:  MOVF   26,F
+00720:  BNZ   0728
+00722:  MOVF   25,W
+00724:  SUBLW  04
+00726:  BC    074C
+00728:  MOVF   26,F
+0072A:  BNZ   074C
+0072C:  MOVF   25,W
+0072E:  SUBLW  09
+00730:  BNC   074C
 .................... 		{ 
-.................... 			servoPulse[0] = servoPulse[1] = 15; 
-004CA:  MOVLW  0F
-004CC:  MOVWF  1D
-004CE:  MOVFF  1D,1C
+.................... 			servoPulse[0] = 1.5; 
+00732:  CLRF   20
+00734:  CLRF   1F
+00736:  MOVLW  40
+00738:  MOVWF  1E
+0073A:  MOVLW  7F
+0073C:  MOVWF  1D
+.................... 			servoPulse[1] = 1.4; 
+0073E:  MOVLW  33
+00740:  MOVWF  24
+00742:  MOVWF  23
+00744:  MOVWF  22
+00746:  MOVLW  7F
+00748:  MOVWF  21
 .................... 		} 
 .................... 		else 
-004D2:  BRA    04DA
+0074A:  BRA    0764
 .................... 		{ 
 .................... 			servoPulse[0] = servoPulse[1] = 0; 
-004D4:  CLRF   1D
-004D6:  MOVFF  1D,1C
-004DA:  MOVLB  0
+0074C:  CLRF   24
+0074E:  CLRF   23
+00750:  CLRF   22
+00752:  CLRF   21
+00754:  MOVFF  24,20
+00758:  MOVFF  23,1F
+0075C:  MOVFF  22,1E
+00760:  MOVFF  21,1D
+00764:  MOVLB  0
 .................... 		} 
-.................... 		 
-.................... 		printf("%5d,%5d\r\n", servoPulse[0], servoPulse[1]); 
-004DC:  MOVLW  01
-004DE:  MOVWF  2B
-004E0:  MOVLW  20
-004E2:  BTFSS  F9E.4
-004E4:  BRA    04E2
-004E6:  MOVWF  FAD
-004E8:  DECFSZ 2B,F
-004EA:  BRA    04E0
-004EC:  MOVFF  1C,2B
-004F0:  MOVLW  17
-004F2:  MOVWF  2C
-004F4:  RCALL  0306
-004F6:  MOVLW  2C
-004F8:  BTFSS  F9E.4
-004FA:  BRA    04F8
-004FC:  MOVWF  FAD
-004FE:  MOVLW  01
-00500:  MOVWF  2B
-00502:  MOVLW  20
-00504:  BTFSS  F9E.4
-00506:  BRA    0504
-00508:  MOVWF  FAD
-0050A:  DECFSZ 2B,F
-0050C:  BRA    0502
-0050E:  MOVFF  1D,2B
-00512:  MOVLW  17
-00514:  MOVWF  2C
-00516:  RCALL  0306
-00518:  MOVLW  0D
-0051A:  BTFSS  F9E.4
-0051C:  BRA    051A
-0051E:  MOVWF  FAD
-00520:  MOVLW  0A
-00522:  BTFSS  F9E.4
-00524:  BRA    0522
-00526:  MOVWF  FAD
 .................... 		 
 .................... 		// 待機 
 .................... 		delay_ms(10); 
-00528:  MOVLW  0A
-0052A:  MOVWF  2B
-0052C:  BRA    03B8
+00766:  MOVLW  0A
+00768:  MOVWF  2E
+0076A:  BRA    05FE
 .................... 	} 
-0052E:  MOVLB  F
-00530:  BRA    046E
+0076C:  MOVLB  F
+0076E:  BRA    06AE
 .................... } 
 ....................  
 .................... #INT_TIMER0 
 .................... void intTimer0(void) 
-00532:  SLEEP 
+00770:  SLEEP 
 .................... { 
 .................... 	int i; 
 .................... 	// 割り込み回数カウント 
@@ -366,112 +364,152 @@ CCS PCH C Compiler, Version 4.132, 55358               11-9-18 23:33
 .................... 	// servoPulseの値を保持する 
 .................... 	static int myServoPulse[SERVO_NUM] = {0}; 
 .................... 	// タイマー再設定 
-.................... 	set_timer0(0xffff - INTERVAL_T0); 
+.................... 	set_timer0(0xffff - T0_INTERVAL); 
 *
-000F8:  SETF   FD7
-000FA:  MOVLW  9B
-000FC:  MOVWF  FD6
+00382:  SETF   FD7
+00384:  MOVLW  9B
+00386:  MOVWF  FD6
 .................... 	// サーボ信号出力 
 .................... 	for(i = 0; i < SERVO_NUM; i++) 
-000FE:  CLRF   34
-00100:  MOVF   34,W
-00102:  SUBLW  01
-00104:  BNC   0166
+00388:  CLRF   35
+0038A:  MOVF   35,W
+0038C:  SUBLW  01
+0038E:  BNC   03F0
 .................... 	{ 
 .................... 		// カウント比較してパルス出力 
 .................... 		if(count < myServoPulse[i]) 
-00106:  CLRF   03
-00108:  MOVF   34,W
-0010A:  ADDLW  25
-0010C:  MOVWF  FE9
-0010E:  MOVLW  00
-00110:  ADDWFC 03,W
-00112:  MOVWF  FEA
-00114:  MOVF   FEF,W
-00116:  SUBWF  24,W
-00118:  BC    0140
+00390:  CLRF   03
+00392:  MOVF   35,W
+00394:  ADDLW  28
+00396:  MOVWF  FE9
+00398:  MOVLW  00
+0039A:  ADDWFC 03,W
+0039C:  MOVWF  FEA
+0039E:  MOVF   FEF,W
+003A0:  SUBWF  27,W
+003A2:  BC    03CA
 .................... 			output_high(servoOut[i]); 
-0011A:  CLRF   03
-0011C:  MOVF   34,W
-0011E:  ADDLW  1A
-00120:  MOVWF  FE9
-00122:  MOVLW  00
-00124:  ADDWFC 03,W
-00126:  MOVWF  FEA
-00128:  MOVFF  FEF,35
-0012C:  MOVFF  35,36
-00130:  MOVLW  01
-00132:  MOVWF  37
-00134:  MOVLW  0F
-00136:  MOVWF  39
-00138:  MOVLW  89
-0013A:  MOVWF  38
-0013C:  RCALL  00BA
+003A4:  CLRF   03
+003A6:  MOVF   35,W
+003A8:  ADDLW  1A
+003AA:  MOVWF  FE9
+003AC:  MOVLW  00
+003AE:  ADDWFC 03,W
+003B0:  MOVWF  FEA
+003B2:  MOVFF  FEF,36
+003B6:  MOVFF  36,37
+003BA:  MOVLW  01
+003BC:  MOVWF  38
+003BE:  MOVLW  0F
+003C0:  MOVWF  3A
+003C2:  MOVLW  89
+003C4:  MOVWF  39
+003C6:  RCALL  00BA
 .................... 		else 
-0013E:  BRA    0162
+003C8:  BRA    03EC
 .................... 			output_low(servoOut[i]); 
-00140:  CLRF   03
-00142:  MOVF   34,W
-00144:  ADDLW  1A
-00146:  MOVWF  FE9
-00148:  MOVLW  00
-0014A:  ADDWFC 03,W
-0014C:  MOVWF  FEA
-0014E:  MOVFF  FEF,35
-00152:  MOVFF  35,36
-00156:  CLRF   37
-00158:  MOVLW  0F
-0015A:  MOVWF  39
-0015C:  MOVLW  89
-0015E:  MOVWF  38
-00160:  RCALL  00BA
+003CA:  CLRF   03
+003CC:  MOVF   35,W
+003CE:  ADDLW  1A
+003D0:  MOVWF  FE9
+003D2:  MOVLW  00
+003D4:  ADDWFC 03,W
+003D6:  MOVWF  FEA
+003D8:  MOVFF  FEF,36
+003DC:  MOVFF  36,37
+003E0:  CLRF   38
+003E2:  MOVLW  0F
+003E4:  MOVWF  3A
+003E6:  MOVLW  89
+003E8:  MOVWF  39
+003EA:  RCALL  00BA
 .................... 	} 
-00162:  INCF   34,F
-00164:  BRA    0100
+003EC:  INCF   35,F
+003EE:  BRA    038A
 .................... 	// インクリメント 
 .................... 	count++; 
-00166:  INCF   24,F
-.................... 	// 1us/カウント * 200 = 20msを超えたらリセット 
-.................... 	if(count > 200) 
-00168:  MOVF   24,W
-0016A:  SUBLW  C8
-0016C:  BC    01AA
+003F0:  INCF   27,F
+.................... 	// 20msを超えたらリセット 
+.................... 	if(count > T0_20ms) 
+003F2:  MOVF   27,W
+003F4:  SUBLW  C8
+003F6:  BC    04A6
 .................... 	{ 
 .................... 		// count初期化 
 .................... 		count = 0; 
-0016E:  CLRF   24
+003F8:  CLRF   27
 .................... 		// 値更新 
 .................... 		for(i = 0; i < SERVO_NUM; i++) 
-00170:  CLRF   34
-00172:  MOVF   34,W
-00174:  SUBLW  01
-00176:  BNC   01AA
-.................... 			myServoPulse[i] = servoPulse[i]; 
-00178:  CLRF   03
-0017A:  MOVF   34,W
-0017C:  ADDLW  25
-0017E:  MOVWF  01
-00180:  MOVLW  00
-00182:  ADDWFC 03,F
-00184:  MOVFF  03,36
-00188:  CLRF   03
-0018A:  MOVF   34,W
-0018C:  ADDLW  1C
-0018E:  MOVWF  FE9
-00190:  MOVLW  00
-00192:  ADDWFC 03,W
-00194:  MOVWF  FEA
-00196:  MOVFF  FEF,37
-0019A:  MOVFF  36,FEA
-0019E:  MOVFF  01,FE9
-001A2:  MOVFF  37,FEF
-001A6:  INCF   34,F
-001A8:  BRA    0172
+003FA:  CLRF   35
+003FC:  MOVF   35,W
+003FE:  SUBLW  01
+00400:  BNC   04A6
+.................... 		{ 
+.................... 			// myServoPulse[カウント]=servoPulse[ms]*1000[u/m]/T0_PERIOD[us] 
+.................... 			myServoPulse[i] = servoPulse[i] * 1000 / T0_PERIOD; 
+00402:  CLRF   03
+00404:  MOVF   35,W
+00406:  ADDLW  28
+00408:  MOVWF  01
+0040A:  MOVLW  00
+0040C:  ADDWFC 03,F
+0040E:  MOVFF  01,36
+00412:  MOVFF  03,37
+00416:  MOVF   35,W
+00418:  MULLW  04
+0041A:  MOVF   FF3,W
+0041C:  CLRF   03
+0041E:  ADDLW  1D
+00420:  MOVWF  FE9
+00422:  MOVLW  00
+00424:  ADDWFC 03,W
+00426:  MOVWF  FEA
+00428:  MOVFF  FEF,38
+0042C:  MOVFF  FEC,39
+00430:  MOVFF  FEC,3A
+00434:  MOVFF  FEC,3B
+00438:  MOVFF  3B,3F
+0043C:  MOVFF  3A,3E
+00440:  MOVFF  39,3D
+00444:  MOVFF  38,3C
+00448:  CLRF   43
+0044A:  CLRF   42
+0044C:  MOVLW  7A
+0044E:  MOVWF  41
+00450:  MOVLW  88
+00452:  MOVWF  40
+00454:  BRA    00F8
+00456:  MOVFF  00,38
+0045A:  MOVFF  01,39
+0045E:  MOVFF  02,3A
+00462:  MOVFF  03,3B
+00466:  MOVFF  03,3F
+0046A:  MOVFF  02,3E
+0046E:  MOVFF  01,3D
+00472:  MOVFF  00,3C
+00476:  CLRF   43
+00478:  CLRF   42
+0047A:  MOVLW  48
+0047C:  MOVWF  41
+0047E:  MOVLW  85
+00480:  MOVWF  40
+00482:  BRA    01EC
+00484:  MOVFF  03,3B
+00488:  MOVFF  02,3A
+0048C:  MOVFF  01,39
+00490:  MOVFF  00,38
+00494:  BRA    0348
+00496:  MOVFF  37,FEA
+0049A:  MOVFF  36,FE9
+0049E:  MOVFF  01,FEF
+.................... 		} 
+004A2:  INCF   35,F
+004A4:  BRA    03FC
 .................... 	} 
 .................... } 
 ....................  
-001AA:  BCF    FF2.2
-001AC:  GOTO   006C
+004A6:  BCF    FF2.2
+004A8:  GOTO   006C
 .................... #INT_TIMER1 
 .................... void intTimer1(void) 
 .................... { 
@@ -481,132 +519,121 @@ CCS PCH C Compiler, Version 4.132, 55358               11-9-18 23:33
 .................... 	// 前の割り込みでの入力の値 
 .................... 	static int inOld[IN_NUM] = {0}; 
 .................... 	// タイマー再設定 
-.................... 	set_timer1(0xffff - INTERVAL_T1); 
+.................... 	set_timer1(0xffff - T1_INTERVAL); 
 *
-00208:  MOVLW  B1
-0020A:  MOVWF  FCF
-0020C:  MOVLW  DF
-0020E:  MOVWF  FCE
+00504:  MOVLW  B1
+00506:  MOVWF  FCF
+00508:  MOVLW  DF
+0050A:  MOVWF  FCE
 .................... 	// 10ms * 10 = 0.1sごとに実行する 
 .................... 	if(count >= 10) 
-00210:  MOVF   28,F
-00212:  BNZ   021A
-00214:  MOVF   27,W
-00216:  SUBLW  09
-00218:  BC    02D2
+0050C:  MOVF   2B,F
+0050E:  BNZ   0516
+00510:  MOVF   2A,W
+00512:  SUBLW  09
+00514:  BC    05BC
 .................... 	{ 
 .................... 		// count初期化 
 .................... 		count = 0; 
-0021A:  CLRF   28
-0021C:  CLRF   27
+00516:  CLRF   2B
+00518:  CLRF   2A
 .................... 		// 値更新 
 .................... 		for(i = 0; i < IN_NUM; i++) 
-0021E:  CLRF   34
-00220:  MOVF   34,W
-00222:  SUBLW  01
-00224:  BNC   02D2
+0051A:  CLRF   35
+0051C:  MOVF   35,F
+0051E:  BNZ   05BC
 .................... 		{ 
 .................... 			// 以前と同じ値だったらインクリメント 
 .................... 			// 違ったら0にする 
 .................... 			if(in(i) == inOld[i]) 
-00226:  MOVFF  34,35
-0022A:  RCALL  01DE
-0022C:  MOVFF  01,35
-00230:  CLRF   03
-00232:  MOVF   34,W
-00234:  ADDLW  29
-00236:  MOVWF  FE9
-00238:  MOVLW  00
-0023A:  ADDWFC 03,W
-0023C:  MOVWF  FEA
-0023E:  MOVF   FEF,W
-00240:  SUBWF  01,W
-00242:  BNZ   0282
+00520:  MOVFF  35,38
+00524:  RCALL  04DA
+00526:  MOVFF  01,36
+0052A:  CLRF   03
+0052C:  MOVF   35,W
+0052E:  ADDLW  2C
+00530:  MOVWF  FE9
+00532:  MOVLW  00
+00534:  ADDWFC 03,W
+00536:  MOVWF  FEA
+00538:  MOVF   FEF,W
+0053A:  SUBWF  01,W
+0053C:  BNZ   057C
 .................... 			{ 
 .................... 				// オーバーフローしそうだったら回避する 
-.................... 				if(inCount[i] != 0xffff) 
-00244:  BCF    FD8.0
-00246:  RLCF   34,W
-00248:  CLRF   03
-0024A:  ADDLW  20
-0024C:  MOVWF  FE9
-0024E:  MOVLW  00
-00250:  ADDWFC 03,W
-00252:  MOVWF  FEA
-00254:  MOVFF  FEC,36
-00258:  MOVF   FED,F
-0025A:  MOVFF  FEF,35
-0025E:  INCFSZ 35,W
-00260:  BRA    0268
-00262:  INCFSZ 36,W
-00264:  BRA    0268
-00266:  BRA    0280
+.................... 				if(inCount[i] < 0xffff) 
+0053E:  BCF    FD8.0
+00540:  RLCF   35,W
+00542:  CLRF   03
+00544:  ADDLW  25
+00546:  MOVWF  FE9
+00548:  MOVLW  00
+0054A:  ADDWFC 03,W
+0054C:  MOVWF  FEA
+0054E:  MOVFF  FEC,37
+00552:  MOVF   FED,F
+00554:  MOVFF  FEF,36
+00558:  INCFSZ 36,W
+0055A:  BRA    0562
+0055C:  INCFSZ 37,W
+0055E:  BRA    0562
+00560:  BRA    057A
 .................... 					inCount[i]++; 
-00268:  BCF    FD8.0
-0026A:  RLCF   34,W
-0026C:  CLRF   03
-0026E:  ADDLW  20
-00270:  MOVWF  FE9
-00272:  MOVLW  00
-00274:  ADDWFC 03,W
-00276:  MOVWF  FEA
-00278:  MOVLW  01
-0027A:  ADDWF  FEE,F
-0027C:  BNC   0280
-0027E:  INCF   FEF,F
+00562:  BCF    FD8.0
+00564:  RLCF   35,W
+00566:  CLRF   03
+00568:  ADDLW  25
+0056A:  MOVWF  FE9
+0056C:  MOVLW  00
+0056E:  ADDWFC 03,W
+00570:  MOVWF  FEA
+00572:  MOVLW  01
+00574:  ADDWF  FEE,F
+00576:  BNC   057A
+00578:  INCF   FEF,F
 .................... 			} 
 .................... 			else 
-00280:  BRA    02CE
+0057A:  BRA    05B8
 .................... 			{ 
 .................... 				inCount[i] = 0; 
-00282:  BCF    FD8.0
-00284:  RLCF   34,W
-00286:  CLRF   03
-00288:  ADDLW  20
-0028A:  MOVWF  FE9
-0028C:  MOVLW  00
-0028E:  ADDWFC 03,W
-00290:  MOVWF  FEA
-00292:  CLRF   FEC
-00294:  MOVF   FED,F
-00296:  CLRF   FEF
-.................... 				inOld[i] = !inOld[i]; 
-00298:  CLRF   03
-0029A:  MOVF   34,W
-0029C:  ADDLW  29
-0029E:  MOVWF  01
-002A0:  MOVLW  00
-002A2:  ADDWFC 03,F
-002A4:  MOVFF  01,35
-002A8:  MOVFF  03,36
-002AC:  CLRF   03
-002AE:  MOVF   34,W
-002B0:  ADDLW  29
-002B2:  MOVWF  FE9
-002B4:  MOVLW  00
-002B6:  ADDWFC 03,W
-002B8:  MOVWF  FEA
-002BA:  MOVF   FEF,F
-002BC:  BZ    02C2
-002BE:  MOVLW  00
-002C0:  BRA    02C4
-002C2:  MOVLW  01
-002C4:  MOVFF  36,FEA
-002C8:  MOVFF  35,FE9
-002CC:  MOVWF  FEF
+0057C:  BCF    FD8.0
+0057E:  RLCF   35,W
+00580:  CLRF   03
+00582:  ADDLW  25
+00584:  MOVWF  FE9
+00586:  MOVLW  00
+00588:  ADDWFC 03,W
+0058A:  MOVWF  FEA
+0058C:  CLRF   FEC
+0058E:  MOVF   FED,F
+00590:  CLRF   FEF
+.................... 				inOld[i] = in(i); 
+00592:  CLRF   03
+00594:  MOVF   35,W
+00596:  ADDLW  2C
+00598:  MOVWF  01
+0059A:  MOVLW  00
+0059C:  ADDWFC 03,F
+0059E:  MOVFF  01,36
+005A2:  MOVFF  03,37
+005A6:  MOVFF  35,38
+005AA:  RCALL  04DA
+005AC:  MOVFF  37,FEA
+005B0:  MOVFF  36,FE9
+005B4:  MOVFF  01,FEF
 .................... 			} 
 .................... 		} 
-002CE:  INCF   34,F
-002D0:  BRA    0220
+005B8:  INCF   35,F
+005BA:  BRA    051C
 .................... 	} 
 .................... 	// インクリメント 
 .................... 	count++; 
-002D2:  INCF   27,F
-002D4:  BTFSC  FD8.2
-002D6:  INCF   28,F
+005BC:  INCF   2A,F
+005BE:  BTFSC  FD8.2
+005C0:  INCF   2B,F
 .................... } 
-002D8:  BCF    F9E.0
-002DA:  GOTO   006C
+005C2:  BCF    F9E.0
+005C4:  GOTO   006C
 
 Configuration Fuses:
    Word  1: F900   INTRC PLLEN PRIMARY FCMEN IESO
