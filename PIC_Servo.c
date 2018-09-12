@@ -8,7 +8,7 @@
 
 // サーボ信号出力用割り込み
 // T0の周期[us]
-#define T0_PERIOD 100
+#define T0_PERIOD 50
 // プリスケーラ16/(64[MHz]/4)=1[us/カウント]
 // T0_INTERVAL[カウント] = T0_PERIOD[us] / 1[us/カウント]
 #define T0_INTERVAL T0_PERIOD
@@ -100,7 +100,7 @@ void intTimer0(void)
 {
 	int i;
 	// 割り込み回数カウント
-	static int count = 0;
+	static long count = 0;
 	// servoPulseの値を保持する
 	static int myServoPulse[SERVO_NUM] = {0};
 	// タイマー再設定
@@ -125,7 +125,7 @@ void intTimer0(void)
 		for(i = 0; i < SERVO_NUM; i++)
 		{
 			// myServoPulse[カウント]=servoPulse[ms]*1000[u/m]/T0_PERIOD[us]
-			myServoPulse[i] = servoPulse[i] * 1000 / T0_PERIOD;
+			myServoPulse[i] = servoPulse[i] * (1000 / T0_PERIOD);
 		}
 	}
 }
@@ -135,7 +135,7 @@ void intTimer1(void)
 {
 	int i;
 	// 割り込み回数カウント
-	static long count = 0;
+	static int count = 0;
 	// 前の割り込みでの入力の値
 	static int inOld[IN_NUM] = {0};
 	// タイマー再設定
