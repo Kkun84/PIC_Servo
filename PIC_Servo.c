@@ -32,7 +32,7 @@
 // サーボ信号出力ピン
 int servoOut[SERVO_NUM] = {PIN_C2, PIN_C3};
 // 入力ピン
-int inPin[IN_NUM] = {PIN_C4};
+int inPin[IN_NUM] = {PIN_C5};
 
 // 出力するサーボの値[ms]
 // (1000/T0_PERIOD)が掛けられるため小数点以下に注意
@@ -76,14 +76,13 @@ void main(void)
 		*/
 		if(inCount[0] < 5)
 		{
-			servoPulse[0] = in(0)? 1.8: 1.5;
-			
-			servoPulse[1] = in(0)? 1.4: 1.7;
+			servoPulse[0] = 1.40 +  in(0)*0.25;
+			servoPulse[1] = 1.40 + !in(0)*0.25;
 		}
 		else if(5 <= inCount[0] && inCount[0] < 10)
 		{
-			servoPulse[0] = 1.5;
-			servoPulse[1] = 1.4;
+			servoPulse[0] = 1.40;
+			servoPulse[1] = 1.40;
 		}
 		else
 		{

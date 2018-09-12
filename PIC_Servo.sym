@@ -29,44 +29,48 @@
 01C     inPin
 01D-024 servoPulse
 025-026 inCount
-027     intTimer0.count
-028-029 intTimer0.myServoPulse
-02A-02B intTimer1.count
+027-028 intTimer0.count
+029-02A intTimer0.myServoPulse
+02B     intTimer1.count
 02C     intTimer1.inOld
 02D     MAIN.i
 02E     @delay_ms1.P1
-02E-02F @ITOF.P2
-035     intTimer0.i
-035     intTimer1.i
-036     intTimer0.@SCRATCH1
-036     intTimer1.@SCRATCH1
-037     @WRITEBITA.P1
-037     intTimer0.@SCRATCH2
-037     intTimer1.@SCRATCH2
-038     in.pin_num
-038     @WRITEBITA.P1
-038-03B @SFTOI.P2
-038     intTimer0.@SCRATCH3
-039-03A @WRITEBITA.P1
-039     in.@SCRATCH1
-039     intTimer0.@SCRATCH4
-03A     @READBITA.P1
-03A     intTimer0.@SCRATCH5
-03B-03C @READBITA.P1
-03B     intTimer0.@SCRATCH6
-03C-03F @MULFF.P1
-03C-03F @DIVFF.P2
-040-043 @DIVFF.P1
-040-043 @MULFF.P2
-044     @MULFF.@SCRATCH1
-044     @DIVFF.@SCRATCH1
-045     @MULFF.@SCRATCH2
-045     @DIVFF.@SCRATCH2
-046     @MULFF.@SCRATCH3
-046     @DIVFF.@SCRATCH3
-047     @DIVFF.@SCRATCH4
-048     @DIVFF.@SCRATCH5
-049     @DIVFF.@SCRATCH6
+02E     MAIN.@SCRATCH1
+02F-030 @ITOF.P1
+02F     MAIN.@SCRATCH2
+030-033 @ADDFF.P1
+034-037 @ADDFF.P1
+038     @ADDFF.@SCRATCH1
+039     @ADDFF.@SCRATCH2
+03A     @ADDFF.@SCRATCH3
+03B     @ADDFF.@SCRATCH4
+03C     @ADDFF.@SCRATCH5
+03D     @ADDFF.@SCRATCH6
+03E     @ADDFF.@SCRATCH7
+03F     @ADDFF.@SCRATCH8
+040     intTimer0.i
+040     intTimer1.i
+041     intTimer0.@SCRATCH1
+041     intTimer1.@SCRATCH1
+042     @WRITEBITA.P1
+042     intTimer0.@SCRATCH2
+042     intTimer1.@SCRATCH2
+043     in.pin_num
+043     @WRITEBITA.P1
+043-046 @SFTOI.P2
+043     intTimer0.@SCRATCH3
+044-045 @WRITEBITA.P1
+044     in.@SCRATCH1
+044     intTimer0.@SCRATCH4
+045     @READBITA.P1
+045     intTimer0.@SCRATCH5
+046-047 @READBITA.P1
+046     intTimer0.@SCRATCH6
+047-04A @MULFF.P1
+04B-04E @MULFF.P1
+04F     @MULFF.@SCRATCH1
+050     @MULFF.@SCRATCH2
+051     @MULFF.@SCRATCH3
 F55     CCP_5_LOW
 F55     CCP_5
 F56     CCP_5_HIGH
@@ -94,19 +98,19 @@ FF6-FF8 @READ_PROGRAM_MEMORY.P1
 FF6-FF8 @WRITE_PROGRAM_MEMORY.P2
 
 ROM Allocation:
-05FE  @delay_ms1
-04DA  in
-04AC  @READBITA
-0628  MAIN
-05C8  @ITOF
-0382  intTimer0
+06C8  @delay_ms1
+0344  in
+0316  @READBITA
+06F2  MAIN
+0428  @ITOF
+00FA  @MULFF
+045E  @ADDFF
+0226  intTimer0
 00BA  @WRITEBITA
-00F8  @MULFF
-01EC  @DIVFF
-0348  @SFTOI
-0504  intTimer1
-0628  @cinit1
-066C  @cinit2
+01EC  @SFTOI
+036E  intTimer1
+06F2  @cinit1
+0736  @cinit2
 
 
 User Memory space: 
@@ -117,10 +121,10 @@ Project Directory:
     C:\Users\Keisuke\Documents\Private\Program\PIC_Servo\
 
 Project Files:
-    PIC_Servo.c                                             [12-9-18 16:39  CRC=9FE03D66]
+    PIC_Servo.c                                             [12-9-18 19:39  CRC=1D99E0EE]
     ..\..\..\..\..\..\Program Files (x86)\PICC\devices\18f26k22.h [04-4-12 14:18  CRC=BC39CD71]
 
-Source signature=1853D848
+Source signature=960D7BD0
 
 Units:
     PIC_Servo (main)
