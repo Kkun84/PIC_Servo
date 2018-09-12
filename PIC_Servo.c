@@ -30,12 +30,13 @@
 
 /*****************************変更ポイント*****************************/
 // サーボ信号出力ピン
-// 出力するサーボの値
-int servoPulse[SERVO_NUM] = {0, 0};
 int servoOut[SERVO_NUM] = {PIN_C2, PIN_C3};
 // 入力ピン
 int inPin[IN_NUM] = {PIN_C4};
 
+// 出力するサーボの値[ms]
+// (1000/T0_PERIOD)が掛けられるため小数点以下に注意
+float servoPulse[SERVO_NUM] = {0};
 // 入力ピン変化後の秒数[ds]
 // 最大6553.5s=109.225min
 long inCount[IN_NUM] = {0};
@@ -122,7 +123,10 @@ void intTimer0(void)
 		count = 0;
 		// 値更新
 		for(i = 0; i < SERVO_NUM; i++)
-			myServoPulse[i] = servoPulse[i];
+		{
+			// myServoPulse[カウント]=servoPulse[ms]*1000[u/m]/T0_PERIOD[us]
+			myServoPulse[i] = servoPulse[i] * 1000 / T0_PERIOD;
+		}
 	}
 }
 
