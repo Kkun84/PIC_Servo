@@ -109,10 +109,7 @@ void intTimer0(void)
 	for(i = 0; i < SERVO_NUM; i++)
 	{
 		// カウント比較してパルス出力
-		if(count < myServoPulse[i])
-			output_high(servoOut[i]);
-		else
-			output_low(servoOut[i]);
+		output_bit(servoOut[i], count < myServoPulse[i]);
 	}
 	// インクリメント
 	count++;
